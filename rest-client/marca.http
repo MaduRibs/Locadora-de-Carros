@@ -1,0 +1,24 @@
+### Inserir dados no banco
+POST http://127.0.0.1:8000/api/marca
+Content-Type: application/x-www-form-urlencoded
+
+nome=Toyota&imagem=toyota_logo.png
+
+### Mostra todas os dados do banco
+
+GET http://127.0.0.1:8000/api/marca
+
+### Mostra um dado especifico do banco
+
+GET http://127.0.0.1:8000/api/marca/4
+
+### Atualiza um dado especifico do banco
+
+PUT http://127.0.0.1:8000/api/marca/5
+Content-Type: application/x-www-form-urlencoded
+
+nome=Toyota%20-%20Teste&imagem=logo_volkswagen.jpeg
+
+### Deleta um dado especifico do banco
+
+DELETE http://127.0.0.1:8000/api/marca/5
