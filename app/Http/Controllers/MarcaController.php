@@ -21,7 +21,7 @@ class MarcaController extends Controller
     public function index()
     {
         $marcas = $this->marca->all(); //Pega todas as informações; Sem instanciar o objeto; Apenas usando um metódo estático
-        return $marcas;
+        return response()->json($marcas,200);
     }
 
     /**
@@ -43,6 +43,15 @@ class MarcaController extends Controller
     public function store(Request $request)
     {
         //$marca = Marca::create($request->all()); //Implementa no banco, recebendo o request com todo array
+
+        //Valida regras e retorna feedback
+        $request->validate($this->marca->rules(), $this->marca->feedback());
+        
+        //Pegamos a imagem do request e armazenamos no filesystem em imagens
+        $image = $request->file('imagem');
+        $image->store('imagens');
+        dd('Upload de arquivos');
+
         $marca = $this->marca->create($request->all());
         return response()->json($marca, 201);
     }
@@ -60,7 +69,7 @@ class MarcaController extends Controller
             return response()->json(['erro' => 'Recurso pesquisado nao existe'], 404);
         }
 
-        return $marca; //O framework já dá um by
+        return response()->json($marca, 200); //O framework já dá um by
     }
 
     /**
@@ -88,9 +97,28 @@ class MarcaController extends Controller
         if($marca === NULL) {
             return response()->json(['erro' => 'Impossivel realizar a atualizacao. O recurso solicitado nao existe'], 404);
         }
-        $marca->update($request->all());
 
-        return $marca;
+        if($request->method() === 'PATCH') {
+            $regrasDinamicas = array();
+
+            //Percorrendo todas as regras definidas no Model
+            foreach($marca->rules() as $input => $regra) {
+
+                //Coletar apenas as regras aplicáveis aos parâmetros parciais da requisição
+                if(array_key_exists($input, $request->all())) {
+                    $regrasDinamicas[$input] = $regra;
+                }
+            }
+
+            
+            $request->validate($regrasDinamicas, $marca->feedback());
+        } else {
+            $request->validate($marca->rules(), $marca->feedback());
+        }
+
+        
+        $marca->update($request->all());
+        return response()->json($marca, 200);
     }
 
     /**
@@ -108,6 +136,6 @@ class MarcaController extends Controller
         }
 
         $marca->delete(); //Deleta a informação no banco
-        return ['msg' => "A marca foi removida com sucesso!"];
+        return response()->json(['msg' => "A marca foi removida com sucesso!"], 200);
     }
 }

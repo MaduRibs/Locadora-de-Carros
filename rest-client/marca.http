@@ -2,7 +2,7 @@
 POST http://127.0.0.1:8000/api/marca
 Content-Type: application/x-www-form-urlencoded
 
-nome=Toyota&imagem=toyota_logo.png
+nome=Mercedes&imagem=mercedes_logo.png
 
 ### Mostra todas os dados do banco
 
@@ -10,15 +10,32 @@ GET http://127.0.0.1:8000/api/marca
 
 ### Mostra um dado especifico do banco
 
-GET http://127.0.0.1:8000/api/marca/4
+GET http://127.0.0.1:8000/api/marca/6
 
 ### Atualiza um dado especifico do banco
 
-PUT http://127.0.0.1:8000/api/marca/5
+PUT http://127.0.0.1:8000/api/marca/6
 Content-Type: application/x-www-form-urlencoded
 
-nome=Toyota%20-%20Teste&imagem=logo_volkswagen.jpeg
+nome=Mercedes%20-%20Teste&imagem=logo_mercedes.jpeg
 
 ### Deleta um dado especifico do banco
 
-DELETE http://127.0.0.1:8000/api/marca/5
+DELETE http://127.0.0.1:8000/api/marca/6
+
+### ENviando uma imagem
+
+POST http://127.0.0.1:8000/api/marca
+Accept: application/json
+Content-Type: multipart/form-data; boundary=Div
+
+--Div
+Content-Disposition: form-data; name="nome"
+
+Hyundai
+--Div
+Content-Disposition: form-data; name="imagem"; filename="hyundai.png"
+Content-Type: image/png
+
+< C:\Users\vitor.pereira\Desktop\imagens_marcas\hyundai.png
+--Div--
