@@ -2,7 +2,7 @@
 POST http://127.0.0.1:8000/api/marca
 Content-Type: application/x-www-form-urlencoded
 
-nome=Mercedes&imagem=mercedes_logo.png
+nome=Ford&imagem=ford_logo.png
 
 ### Mostra todas os dados do banco
 
@@ -14,28 +14,130 @@ GET http://127.0.0.1:8000/api/marca/6
 
 ### Atualiza um dado especifico do banco
 
-PUT http://127.0.0.1:8000/api/marca/6
+PUT http://127.0.0.1:8000/api/marca/7
 Content-Type: application/x-www-form-urlencoded
 
 nome=Mercedes%20-%20Teste&imagem=logo_mercedes.jpeg
 
 ### Deleta um dado especifico do banco
 
-DELETE http://127.0.0.1:8000/api/marca/6
+DELETE http://127.0.0.1:8000/api/marca/8
 
-### ENviando uma imagem
+### Enviando uma imagem para marca
 
 POST http://127.0.0.1:8000/api/marca
 Accept: application/json
-Content-Type: multipart/form-data; boundary=Div
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
 
---Div
+------WebKitFormBoundary
 Content-Disposition: form-data; name="nome"
 
-Hyundai
---Div
+Ford
+------WebKitFormBoundary
+Content-Disposition: form-data; name="imagem"; filename="ford.png"
+Content-Type: image/png
+
+< C:/Users/vitor.pereira/Desktop/imagens_marcas/ford.png
+------WebKitFormBoundary--
+
+### Buscando imagem
+
+GET  http://127.0.0.1:8000/storage/imagens\/Wl03kpdqYTqTyypWpBTJpZ0NSOexHl7FDdUTdIMv.png
+
+
+### Atualizar uma imagem
+
+POST  http://127.0.0.1:8000/api/marca/8
+Accept: application/json
+X-HTTP-Method-Override: PUT
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="nome"
+
+BMW
+------WebKitFormBoundary
 Content-Disposition: form-data; name="imagem"; filename="hyundai.png"
 Content-Type: image/png
 
-< C:\Users\vitor.pereira\Desktop\imagens_marcas\hyundai.png
---Div--
+< C:/Users/vitor.pereira/Desktop/imagens_marcas/bmw.png
+------WebKitFormBoundary--
+
+### Enviando uma imagem para modelo
+
+POST http://127.0.0.1:8000/api/modelo
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary123456
+
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="marca_id"
+
+1
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="nome"
+
+Ford KA 1.0
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="imagem"; filename="ford.png"
+Content-Type: image/png
+
+< C:\Users\vitor.pereira\Desktop\imagens_modelos\ford_ka_1_0.png
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="numero_portas"
+
+4
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="lugares"
+
+5
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="air_bag"
+
+1
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="abs"
+
+1
+------WebKitFormBoundary123456--
+
+### Mostra todas os dados do banco modelo
+
+GET http://127.0.0.1:8000/api/modelo/12
+
+### Atualizar uma imagem do modelo
+
+POST  http://127.0.0.1:8000/api/modelo/12
+Accept: application/json
+X-HTTP-Method-Override: PUT
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary123456
+
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="marca_id"
+
+1
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="nome"
+
+Ford KA Sedan 1.0
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="imagem"; filename="ford.png"
+Content-Type: image/png
+
+< C:\Users\vitor.pereira\Desktop\imagens_modelos\ford_ka_sedan_1_0.png
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="numero_portas"
+
+4
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="lugares"
+
+5
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="air_bag"
+
+1
+------WebKitFormBoundary123456
+Content-Disposition: form-data; name="abs"
+
+1
+------WebKitFormBoundary123456--

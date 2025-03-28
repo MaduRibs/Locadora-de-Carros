@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+//Para deletar utilizando o storage
+use Illuminate\Support\Facades\Storage;
 use App\Models\Marca;
 use Illuminate\Http\Request;
 
@@ -20,7 +22,7 @@ class MarcaController extends Controller
      */
     public function index()
     {
-        $marcas = $this->marca->all(); //Pega todas as informações; Sem instanciar o objeto; Apenas usando um metódo estático
+        $marcas = $this->marca->with('modelos')->get(); //Pega todas as informações; Sem instanciar o objeto; Apenas usando um metódo estático
         return response()->json($marcas,200);
     }
 
@@ -42,17 +44,20 @@ class MarcaController extends Controller
      */
     public function store(Request $request)
     {
-        //$marca = Marca::create($request->all()); //Implementa no banco, recebendo o request com todo array
-
         //Valida regras e retorna feedback
         $request->validate($this->marca->rules(), $this->marca->feedback());
         
         //Pegamos a imagem do request e armazenamos no filesystem em imagens
-        $image = $request->file('imagem');
-        $image->store('imagens');
-        dd('Upload de arquivos');
+        $imagem = $request->file('imagem');
 
-        $marca = $this->marca->create($request->all());
+        //primeiro parametro que recebe e o diretorio onde fica, segundo se é local
+        $imagem_urn = $imagem->store('imagens', 'public');
+        
+        $marca = $this->marca->create([
+            'nome' => $request->nome,
+            'imagem' => $imagem_urn
+        ]);
+        
         return response()->json($marca, 201);
     }
 
@@ -64,7 +69,7 @@ class MarcaController extends Controller
      */
     public function show($id) // O proprio laravel instancia o marca
     {
-        $marca = $this->marca->find($id);
+        $marca = $this->marca->with('modelos')->find($id);
         if($marca === NULL) {
             return response()->json(['erro' => 'Recurso pesquisado nao existe'], 404);
         }
@@ -116,8 +121,20 @@ class MarcaController extends Controller
             $request->validate($marca->rules(), $marca->feedback());
         }
 
+        //remove o arquivo antigo caso um novo arquivo esteja no request
+        if($request->file('imagem')) {
+            Storage::disk('public')->delete($marca->imagem);
+        }
+
+        $imagem = $request->file('imagem'); //Pega a imagem do request
+        $imagem_urn = $imagem->store('imagens', 'public'); //Retorna o link da imagem
         
-        $marca->update($request->all());
+        
+        $marca->update([
+            'nome' => $request->nome,
+            'imagem' => $imagem_urn
+        ]);
+
         return response()->json($marca, 200);
     }
 
@@ -135,6 +152,8 @@ class MarcaController extends Controller
             return response()->json(['erro' => 'Impossivel realizar a exclusao. O recurso solicitado nao existe.'], 404);
         }
 
+        Storage::disk('public')->delete($marca->imagem);
+        
         $marca->delete(); //Deleta a informação no banco
         return response()->json(['msg' => "A marca foi removida com sucesso!"], 200);
     }
