@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Marca;
 use Illuminate\Http\Request;
+use App\Repositories\MarcaRepository;
 
 class MarcaController extends Controller
 {
@@ -20,10 +21,28 @@ class MarcaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $marcas = $this->marca->with('modelos')->get(); //Pega todas as informações; Sem instanciar o objeto; Apenas usando um metódo estático
-        return response()->json($marcas,200);
+        $marcaRepository = new MarcaRepository($this->marca);
+
+        if($request->has('atributos_modelos')) {
+            $atributos_modelos = 'modelos:id,'.$request->atributos_modelos;
+            $marcaRepository->selectAtributosRegistrosRelacionados($atributos_modelos);
+        } else {
+            $marcaRepository->selectAtributosRegistrosRelacionados('modelos');
+        }
+
+        if($request->has('filtro')) {
+            $marcaRepository->filtro($request->filtro);
+            } 
+        
+
+        if($request->has('atributos')) {
+
+            $marcaRepository->selectAtributos($request->atributos);
+        }
+
+        return response()->json($marcaRepository->getResultado(),200);
     }
 
     /**
@@ -98,6 +117,7 @@ class MarcaController extends Controller
     public function update(Request $request, $id)
     {
         $marca = $this->marca->find($id);
+        $imagem_urn = "";
 
         if($marca === NULL) {
             return response()->json(['erro' => 'Impossivel realizar a atualizacao. O recurso solicitado nao existe'], 404);
@@ -124,16 +144,14 @@ class MarcaController extends Controller
         //remove o arquivo antigo caso um novo arquivo esteja no request
         if($request->file('imagem')) {
             Storage::disk('public')->delete($marca->imagem);
+            $imagem = $request->imagem; //Pega a imagem do request
+            $imagem_urn = $imagem->store('imagens', 'public'); //Retorna o link da imagem
         }
 
-        $imagem = $request->file('imagem'); //Pega a imagem do request
-        $imagem_urn = $imagem->store('imagens', 'public'); //Retorna o link da imagem
-        
-        
-        $marca->update([
-            'nome' => $request->nome,
-            'imagem' => $imagem_urn
-        ]);
+        $marca->fill($request->all());
+        $marca->imagem = $imagem_urn != "" ? $imagem_urn : $marca->imagem;
+
+        $marca->save();//Atualiza ou cria no banco de dados
 
         return response()->json($marca, 200);
     }
